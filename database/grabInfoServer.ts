@@ -4,17 +4,11 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
-class Transaction {
+interface Transaction {
   date: string;
   amount: number;
   id: string;
   payee: string;
-  constructor(date: string, amount: number, id: string, payee: string) {
-    this.date = date;
-    this.amount = amount;
-    this.id = id;
-    this.payee = payee;
-  }
 }
 
 app.use(express.json());
@@ -50,8 +44,12 @@ app.get("/api/transactions", async (_req: Request, res: Response) => {
     const data: YnabResponse = await response.json();
 
     const transactions: Transaction[] = data.data.transactions.map(
-      (t: YnabTransaction) =>
-        new Transaction(t.date, t.amount, t.id, t.payee_name)
+      (t: YnabTransaction) => ({
+        date: t.date,
+        amount: t.amount,
+        id: t.id,
+        payee: t.payee_name || "Unkown",
+      })
     );
 
     res.json(transactions);
