@@ -1,0 +1,3 @@
+GET http://localhost:3000/api/transactions
+Authorization: Bearer VY3o0837AJKDuuUmpTgHcxitqy76-qcyVNeWZg3_EJM
+Content-Type: application/json
