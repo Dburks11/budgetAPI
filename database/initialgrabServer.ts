@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import sequelize from "./sequelize";
-import ITransaction from "./models/Transaction";
 import Transaction from "./models/Transaction";
 
 dotenv.config();
