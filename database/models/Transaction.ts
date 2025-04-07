@@ -1,7 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../sequelize";
 
-// Define an interface for type-checking
+// interface for type-checking
 export interface ITransaction {
   id: string;
   date: string;
@@ -9,7 +9,7 @@ export interface ITransaction {
   payee: string;
 }
 
-// Define the Sequelize model
+// the Sequelize model
 class Transaction extends Model<ITransaction> implements ITransaction {
   public id!: string;
   public date!: string;
