@@ -55,7 +55,7 @@ app.get("/api/transactions", async (_req: Request, res: Response) => {
     const transactions = data.data.transactions.map((t: YnabTransaction) => ({
       id: t.id,
       date: t.date,
-      amount: t.amount,
+      amount: parseFloat(t.amount.toFixed(2)),
       payee: t.payee_name || "Unknown",
     }));
 
