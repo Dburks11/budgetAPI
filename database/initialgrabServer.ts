@@ -1,6 +1,8 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
-import sequelize = require("sequelize");
+import sequelize from "./sequelize";
+import ITransaction from "./models/Transaction";
+import Transaction from "./models/Transaction";
 
 dotenv.config();
 
@@ -8,12 +10,15 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
-interface Transaction {
-  date: string;
-  amount: number;
-  id: string;
-  payee: string;
-}
+// Sync the database
+sequelize
+  .sync()
+  .then(() => {
+    console.log("Database synced successfully.");
+  })
+  .catch((error) => {
+    console.error("Error syncing database:", error);
+  });
 
 app.use(express.json());
 
@@ -47,17 +52,24 @@ app.get("/api/transactions", async (_req: Request, res: Response) => {
 
     const data: YnabResponse = await response.json();
 
-    const transactions: Transaction[] = data.data.transactions.map(
-      (t: YnabTransaction) => ({
-        date: t.date,
-        amount: t.amount,
-        id: t.id,
-        payee: t.payee_name || "Unkown",
-      })
-    );
+    // Map the API response to plain objects
+    const transactions = data.data.transactions.map((t: YnabTransaction) => ({
+      id: t.id,
+      date: t.date,
+      amount: t.amount,
+      payee: t.payee_name || "Unknown",
+    }));
 
-    res.json(transactions);
-    console.log(transactions);
+    // Save transactions to the database
+    for (const transaction of transactions) {
+      await Transaction.upsert(transaction); // Use upsert to avoid duplicates
+    }
+
+    // Fetch all transactions from the database
+    const savedTransactions = await Transaction.findAll();
+
+    res.json(savedTransactions);
+    console.log("Transactions saved to the database:", savedTransactions);
   } catch (error: unknown) {
     if (error instanceof Error) {
       res.status(500).json({ error: error.message });
